@@ -1,0 +1,370 @@
+[
+    {
+        "subtitle": "<span style='font-weight: 500;'>We are in receipt of your payoff request and will respond shortly. To help serve you better, please provide the following</span>",
+        "columns": [
+            {
+                "title": "Expected Loan Payoff",
+                "fields": [
+                    {
+                        "name": "payoff_date",
+                        "type": "datepicker",
+                        "grid_props": {
+                            "textAlign": "center"
+                        },
+                        "initial_value": null,
+                        "validation":{
+                            "type": "date",
+                            "required": "Payoff date is required",
+                            "nullable": null
+                        }
+                    }
+                ]
+            },
+            {
+                "title": "Reason for Request",
+                "hide_before_previous": true,
+                "fields": [
+                    {
+                        "name": "payoff_reason",
+                        "type": "toggle",
+                        "choices": [
+                            {
+                                "label": "PROPERTY SALE",
+                                "value": "PROPERTY_SALE"
+                            },
+                            {
+                                "label": "REFINANCE",
+                                "value": "REFINANCE"
+                            }
+                        ],
+                        "validation":{
+                            "type": "string",
+                            "required": "Payoff reason is required",
+                            "nullable": null
+                        }
+                    },
+                    {
+                        "name": "reinvesting",
+                        "label": "Plan to Reinvest Proceeds?",
+                        "type": "switch",
+                        "initial_value": true,
+                        "props": {
+                            "placement": "top",
+                            "defaultChecked": true,
+                            "style": {
+                                "justifyContent": "center"
+                            }
+                        },
+                        "validation":{
+                            "type": "boolean",
+                            "nullable": null
+                        },
+                        "show_if": {
+                            "payoff_reason": "PROPERTY_SALE"
+                        }
+                    }
+                ]
+            }
+        ],
+        "grid_props": {
+            "style": {
+                "paddingLeft": "20px",
+                "paddingRight": "30px",
+                "justifyContent": "center"
+            }
+        },
+        "submit_if_any": {
+            "payoff_reason": "REFINANCE",
+            "reinvesting":false
+        }
+    },
+    {
+        "title": "Reinvestment Preference",
+        "notice": "We are able to offer you confidential access to opportunities that custom-match your buying needs. These include off-market and distressed opportunites that otherwise may not be available to you. There is no cost to you for this service, provided via our trusted partner nxtCRE, and your privacy and information are confidential and secure.",
+        "columns": [
+            {
+                "title": "Investment Structure",
+                "fields": [
+                    {
+                        "name": "investment_structure",
+                        "type": "toggle",
+                        "choices_data": "available_investment_structure",
+                        "grid_props": {
+                            "mx": "10%"
+                        },
+                        "validation":{
+                            "type": "array",
+                            "min": 1,
+                            "required": "Please choose investment structure",
+                            "nullable": null
+                        },
+                        "props": {
+                            "exclusive": false
+                        }
+                    }
+                ]
+            },
+            {
+                "title": "Property Type",
+                "fields": [
+                    {
+                        "name": "property_types",
+                        "type": "select_tiles",
+                        "choices_data": "available_property_types",
+                        "max_options": 6,
+                        "props": {
+                            "icons": true
+                        },
+                        "validation":{
+                            "type": "array",
+                            "min": 1,
+                            "required": "Please choose at least one property type",
+                            "nullable": null
+                        }
+                    }
+                ]
+            }
+        ],
+        "grid_props": {
+            "style": {
+                "paddingLeft": "20px",
+                "paddingRight": "30px"
+            }
+        }
+    },
+    {
+        "title": "Location Preference",
+        "subtitle": "You can add multiple locations.",
+        "columns": [
+            {
+                "fields": [
+                    {
+                        "name": "counties",
+                        "type": "county_selector",
+                        "initial_value": [],
+                        "validation":{
+                            "type": "array",
+                            "min": 1,
+                            "required": "Please choose at least one county"
+                        }
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "title": "Property Value and Equity",
+        "columns": [
+            {
+                "groups": [
+                    {
+                        "title": "Total Desired Property Value",
+                        "fields": [
+                            {
+                                "name": "minimum_property_value",
+                                "label": "Minimum Value",
+                                "type": "number",
+                                "grid_props": {
+                                    "md": 6
+                                },
+                                "props": {
+                                    "fullWidth": true,
+                                    "thousandSeparator": true,
+                                    "decimalScale": 0,
+                                    "startAdornmentText": "$",
+                                    "placeholder": "1,000,000",
+                                    "variant": "outlined"
+                                },
+                                "validation":{
+                                    "type": "number",
+                                    "positive": "Please enter a positive number.",
+                                    "required": "Minimum property value is required.",
+                                    "typeError": "A number is required",
+                                    "min": [100000,"Please enter a minimum of $100,000"],
+                                    "nullable": null
+                                }
+                            },
+                            {
+                                "name": "maximum_property_value",
+                                "label": "Maximum Value",
+                                "type": "number",
+                                "grid_props": {
+                                    "md": 6
+                                },
+                                "props": {
+                                    "fullWidth": true,
+                                    "thousandSeparator": true,
+                                    "decimalScale": 0,
+                                    "startAdornmentText": "$",
+                                    "placeholder": "100,000,000",
+                                    "variant": "outlined"
+                                },
+                                "validation":{
+                                    "type": "number",
+                                    "positive": "Please enter a positive number.",
+                                    "required": "Maximum property value is required.",
+                                    "moreThan": ["ref","minimum_property_value","Must be greater than the minimum."],
+                                    "nullable": null
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "title": "Minimum Equity Reinvestment",
+                        "fields": [
+                            {
+                                "name": "minimum_equity_proceeds",
+                                "label": "Minimum Equity Proceeds for Reinvestment",
+                                "type": "number",
+                                "props": {
+                                    "fullWidth": true,
+                                    "thousandSeparator": true,
+                                    "decimalScale": 0,
+                                    "startAdornmentText": "$",
+                                    "placeholder": "10,000,000",
+                                    "variant": "outlined"
+                                },
+                                "validation":{
+                                    "type": "number",
+                                    "positive": "Please enter a positive number.",
+                                    "required": "Minimum Equity value is required.",
+                                    "max": ["ref","maximum_property_value","Must be less than the maximum property value."],
+                                    "nullable": null
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        ],
+        "grid_props": {
+            "style": {
+                "paddingLeft": "20px",
+                "paddingRight": "30px"
+            }
+        },
+        "maxWidth": "500px",
+        "minWidth": "50%"
+    },
+    {
+        "title": "Contact information",
+        "notice": "Important Notice: <br />The information provided here is confidential. Your desired investment profile will be secured anonymously in a private data file which cross-references currently available CRE opportunites that match your needs. You will be promptly notified of matches and may then proceed as you wish. We are pleased to provide this service at no cost and you are under no obligation.",
+        "columns": [
+            {
+                "groups": [
+                    {
+                        "fields": [
+                            {
+                                "name": "first_name",
+                                "label": "First Name",
+                                "type": "text",
+                                "grid_props": {
+                                    "md": 6
+                                },
+                                "props": {
+                                    "fullWidth": true,
+                                    "variant": "standard"
+                                },
+                                "validation":{
+                                    "type": "string",
+                                    "required": "First name is required",
+                                    "nullable": null
+                                }
+                            },
+                            {
+                                "name": "last_name",
+                                "label": "Last Name",
+                                "type": "text",
+                                "grid_props": {
+                                    "md": 6
+                                },
+                                "props": {
+                                    "fullWidth": true,
+                                    "variant": "standard"
+                                },
+                                "validation":{
+                                    "type": "string",
+                                    "required": "Last name is required",
+                                    "nullable": null
+                                }
+                            },
+                            {
+                                "name": "primary_email",
+                                "label": "Email",
+                                "disable_if_present": true,
+                                "type": "text",
+                                "grid_props": {
+                                    "md": 6
+                                },
+                                "props": {
+                                    "fullWidth": true,
+                                    "variant": "standard"
+                                },
+                                "validation":{
+                                    "type": "string",
+                                    "email":"Must be a valid email",
+                                    "max": 255,
+                                    "required": "Email is required",
+                                    "nullable": null
+                                }
+                            },
+                            {
+                                "name": "phone",
+                                "label": "Phone",
+                                "type": "number",
+                                "grid_props": {
+                                    "md": 6
+                                },
+                                "props": {
+                                    "fullWidth": true,
+                                    "variant": "standard",
+                                    "isPhoneNumber": true
+                                },
+                                "tooltip": {
+                                    "icon": "help",
+                                    "content": "Emails can go astray. We need to be able to contact you in case you have not responded to a time-sensitive email about a match."
+                                },
+                                "validation":{
+                                    "type": "string",
+                                    "required": "Phone is required",
+                                    "matches" :["/^[0-9]+$/", "Phone number is not valid"],
+                                    "min":[10,"Phone number is not valid"],
+                                    "max":[10,"Phone number is not valid"],
+                                    "nullable": null
+                                }
+                            },
+                            {
+                                "name": "organization_name",
+                                "label": "Organization",
+                                "type": "text",
+                                "props": {
+                                    "fullWidth": true,
+                                    "variant": "standard",
+                                    "helperText": "optional"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        ],
+        "grid_props": {
+            "style": {
+                "paddingLeft": "20px",
+                "paddingRight": "30px"
+            }
+        },
+        "maxWidth": "500px",
+        "minWidth": "60%"
+    },
+    {
+        "title": "Review",
+        "notice": "Of Benefit:<br /> NxtCRe is a unique CRE transaction matching service which partners with financial institutions across the nation. Referred investors like you are able to anonymously receive custom-matched opportunities listed by sellers. If an opportunity appeals to you, you may then allow the seller to contact you and proceed as you wish. You have full control and your privacy is protected. <br /><br /> You can learn more by viewing <a href='https://nxtcre.com/frequently-asked-questions/' target='_blank'>Frequently Asked Questions</a>, or by visiting our website <a href='https://nxtcre.com' target='_blank'>nxtcre.com</a>. We hope this valuable service is helpful, and we look forward to assisting you in your investing and financing needs.",
+        "grid_props": {
+            "style": {
+                "paddingLeft": "20px",
+                "paddingRight": "30px"
+            }
+        }
+    }
+]
