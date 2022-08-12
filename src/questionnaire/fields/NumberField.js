@@ -1,8 +1,8 @@
 /* eslint-disable indent */
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import { at } from 'lodash';
 import { useField, useFormikContext } from 'formik';
-import { TextField, Tooltip, IconButton, InputAdornment } from '@mui/material';
+import { TextField, Tooltip, InputAdornment } from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import NumberFormat from 'react-number-format';
 import { makeStyles } from '@mui/styles';
@@ -11,7 +11,7 @@ const useStyles = makeStyles({
   input: {
     flex: 1,
     '&::placeholder': {
-      color: '#CCC'
+      color: '#ccc !important'
     }
   },
 });
@@ -19,7 +19,7 @@ const useStyles = makeStyles({
 export default function InputField(props) {
   const { errorText, isDisabled, readOnly, infoText, startAdornmentText, endAdornmentText, thousandSeparator, isPhoneNumber, decimalScale, ...rest } = props;
   const [field, meta] = useField(props);
-  const { handleBlur, setFieldValue } = useFormikContext();
+  const { handleBlur, setFieldValue,validateForm } = useFormikContext();
 
   const classes = useStyles();
 
@@ -45,6 +45,10 @@ export default function InputField(props) {
     }
   }
 
+  useEffect(() => {
+    validateForm(); //we need to revalidate onMount
+  }, []);
+
 
   return (
     <NumberFormat
@@ -62,7 +66,7 @@ export default function InputField(props) {
       thousandSeparator={thousandSeparator}
       format={isPhoneNumber ? '(###) ###-####' : undefined}
       mask="_"
-      //onBlur={_handleBlur}
+      onBlur={handleBlur}
       error={!!(meta.touched && meta.error)}
       helperText={_renderHelperText()}
       {...field}

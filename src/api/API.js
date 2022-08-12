@@ -17,7 +17,7 @@ export const api = (addParseHeader=true) => {
       'Content-Type': 'application/json; charset=UTF-8',
       Accept: 'application/json'
     },
-    timeout: 10000,
+    timeout: 50000,
   });
 
   axiosRetry(axiosClient, {
@@ -26,7 +26,7 @@ export const api = (addParseHeader=true) => {
     retryCondition: () => true // retry no matter what
   });
 
-  axiosClient.interceptors.response.use(
+  axiosClient.interceptors?.response.use(
     response => response,
     error => {
       console.log(error);
@@ -85,8 +85,8 @@ export const getCounties = async () => {
 }
 
 export const handleStatusCode = (error) => {
-  if (error.name === "AxiosError") error = error.response?.data;
-  switch (error.response?.status || error.status_code || error.code) {
+  if (error.name === "AxiosError") error = error?.response?.data;
+  switch (error?.response?.status || error?.status_code || error?.code) {
     case 200:
     case 201:
     case 204:
@@ -100,7 +100,7 @@ export const handleStatusCode = (error) => {
       throw error;
     default:
       //console.error('ERR',error);
-      toast.error((typeof error.message === 'string' ? error?.message : JSON.stringify(error.message)) || JSON.stringify(error?.error || error || "Server error"));
+      toast.error((typeof error?.message === 'string' ? error?.message : JSON.stringify(error?.message)) || JSON.stringify(error?.error || error || "Server error"));
       throw error || new Error("Server error");
   }
 

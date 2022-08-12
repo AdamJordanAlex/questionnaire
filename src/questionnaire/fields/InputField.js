@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { at } from 'lodash';
-import { useField } from 'formik';
+import { useField,useFormikContext } from 'formik';
 import { TextField, Tooltip, InputAdornment } from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 
@@ -14,6 +14,7 @@ export default function InputField(props) {
     ...rest
   } = props;
   const [field, meta] = useField(props);
+  const { validateForm } = useFormikContext();
 
   let startAdornment = undefined;
   if (startAdornmentText) {
@@ -34,6 +35,10 @@ export default function InputField(props) {
       </Tooltip>
     );
   }
+
+  useEffect(() => {
+    validateForm(); //we need to revalidate onMount
+  }, []);
 
   function _renderHelperText() {
     const [touched, error] = at(meta, 'touched', 'error');

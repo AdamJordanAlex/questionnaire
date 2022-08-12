@@ -1,6 +1,7 @@
 [
     {
         "subtitle": "<span style='font-weight: 500;'>We are in receipt of your payoff request and will respond shortly. To help serve you better, please provide the following</span>",
+        "name": "expected_payoff",
         "columns": [
             {
                 "title": "Expected Loan Payoff",
@@ -80,6 +81,7 @@
     },
     {
         "title": "Reinvestment Preference",
+        "name": "preference",
         "notice": "We are able to offer you confidential access to opportunities that custom-match your buying needs. These include off-market and distressed opportunites that otherwise may not be available to you. There is no cost to you for this service, provided via our trusted partner nxtCRE, and your privacy and information are confidential and secure.",
         "columns": [
             {
@@ -134,6 +136,7 @@
     },
     {
         "title": "Location Preference",
+        "name": "locations",
         "subtitle": "You can add multiple locations.",
         "columns": [
             {
@@ -154,6 +157,7 @@
     },
     {
         "title": "Property Value and Equity",
+        "name": "property_value",
         "columns": [
             {
                 "groups": [
@@ -163,6 +167,7 @@
                             {
                                 "name": "minimum_property_value",
                                 "label": "Minimum Value",
+                                "initial_value": "",
                                 "type": "number",
                                 "grid_props": {
                                     "md": 6
@@ -180,8 +185,7 @@
                                     "positive": "Please enter a positive number.",
                                     "required": "Minimum property value is required.",
                                     "typeError": "A number is required",
-                                    "min": [100000,"Please enter a minimum of $100,000"],
-                                    "nullable": null
+                                    "min": [100000,"Please enter a minimum of $100,000"]
                                 }
                             },
                             {
@@ -203,8 +207,7 @@
                                     "type": "number",
                                     "positive": "Please enter a positive number.",
                                     "required": "Maximum property value is required.",
-                                    "moreThan": ["ref","minimum_property_value","Must be greater than the minimum."],
-                                    "nullable": null
+                                    "moreThan": ["ref","minimum_property_value","Must be greater than the minimum."]
                                 }
                             }
                         ]
@@ -228,8 +231,7 @@
                                     "type": "number",
                                     "positive": "Please enter a positive number.",
                                     "required": "Minimum Equity value is required.",
-                                    "max": ["ref","maximum_property_value","Must be less than the maximum property value."],
-                                    "nullable": null
+                                    "max": ["ref","maximum_property_value","Must be less than the maximum property value."]
                                 }
                             }
                         ]
@@ -248,7 +250,9 @@
     },
     {
         "title": "Contact information",
+        "name": "contacts",
         "notice": "Important Notice: <br />The information provided here is confidential. Your desired investment profile will be secured anonymously in a private data file which cross-references currently available CRE opportunites that match your needs. You will be promptly notified of matches and may then proceed as you wish. We are pleased to provide this service at no cost and you are under no obligation.",
+        "hide_notice_if_last_step": true,
         "columns": [
             {
                 "groups": [
@@ -355,10 +359,15 @@
             }
         },
         "maxWidth": "500px",
-        "minWidth": "60%"
+        "minWidth": "60%",
+        "submit_if_any": {
+            "payoff_reason": "REFINANCE",
+            "reinvesting":false
+        }
     },
     {
         "title": "Review",
+        "name": "review",
         "notice": "Of Benefit:<br /> NxtCRe is a unique CRE transaction matching service which partners with financial institutions across the nation. Referred investors like you are able to anonymously receive custom-matched opportunities listed by sellers. If an opportunity appeals to you, you may then allow the seller to contact you and proceed as you wish. You have full control and your privacy is protected. <br /><br /> You can learn more by viewing <a href='https://nxtcre.com/frequently-asked-questions/' target='_blank'>Frequently Asked Questions</a>, or by visiting our website <a href='https://nxtcre.com' target='_blank'>nxtcre.com</a>. We hope this valuable service is helpful, and we look forward to assisting you in your investing and financing needs.",
         "grid_props": {
             "style": {

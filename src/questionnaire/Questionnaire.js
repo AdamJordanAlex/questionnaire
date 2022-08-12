@@ -1,10 +1,10 @@
 import { Alert, Link, InputAdornment, Tooltip, Dialog, DialogContent, DialogTitle, DialogContentText, Grid, Typography, Box, Button, CircularProgress, Paper } from '@mui/material';
 import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect,memo } from 'react';
 import useStyles from './styles';
 import questions from './questions.json';
-import { getQuestionnaire,getQuestionnaireOptionsByLender, submitQuestionnaire } from '../api/API';
+import { getQuestionnaire, getQuestionnaireOptionsByLender, submitQuestionnaire } from '../api/API';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import HelpIcon from '@mui/icons-material/Help';
@@ -17,10 +17,13 @@ import SwitchField from './fields/SwitchField';
 import NumberField from './fields/NumberField';
 import InputField from './fields/InputField';
 import QuestionnaireSkeleton from './QuestionnaireSkeleton';
+import { useSearchParams, useLocation, useParams } from "react-router-dom";
 
 
 const Questionnaire = () => {
-    const code = window.location.pathname.substring(1);
+    const location = useLocation();
+    const { code, lender_id } = useParams();
+    const [searchParams, setSearchParams] = useSearchParams();
     const [isLoading, setLoading] = useState(true);
     const [step, setStep] = useState(0);
     const [questionnaireNotification, setQuestionnaireNotification] = useState(false);
@@ -42,16 +45,39 @@ const Questionnaire = () => {
         return acc;
     }, []);
 
-    const init=()=>{
-        if (code.substring(0,2)=='l/')
-            loadQuestionnaireOptionsByLender(code.substring(2));
+    const init = () => {
+        if (lender_id)
+            loadQuestionnaireOptionsByLender();
         else
             loadQuestionnaire();
     }
-    const loadQuestionnaireOptionsByLender = async(lender_id) =>{
+
+    const loadQuestionnaireOptionsByLender = async () => {
+        if (questions.findIndex((el => el.name == 'contacts')) == -1) {
+            console.error("Questions list doesn't contain page with 'contacts' name");
+            setQuestionnaireNotification(<>
+                <p>Internal error</p>
+                <Link
+                    href="https://nxtcre.com"
+                    rel="questionnaire"
+                    variant="body2"
+                    sx={{ mb: 2 }}
+                >GO TO NXTCRE.COM</Link>
+            </>);
+            return;
+        }
+        if (!questions[0].submit_if_any) {
+            console.error("First page of questions should contain 'submit_if_any' field");
+        }
         setLoading(true);
         try {
             let data = await getQuestionnaireOptionsByLender(lender_id);
+            data.questionnaire = {};
+            if (searchParams.get("email")) data.questionnaire.primary_email = searchParams.get("email");
+            if (searchParams.get("phone")) data.questionnaire.phone = searchParams.get("phone");
+            if (searchParams.get("first_name")) data.questionnaire.first_name = searchParams.get("first_name");
+            if (searchParams.get("last_name")) data.questionnaire.last_name = searchParams.get("last_name");
+            if (searchParams.get("organization")) data.questionnaire.organization_name = searchParams.get("organization");
             setQuestionnaireData(data);
             setLender(data.lender);
         } catch (err) {
@@ -94,7 +120,7 @@ const Questionnaire = () => {
                             <h1>This form has been submitted</h1>
                             <p>To view property matches now, set up your account.</p>
                             <Link
-                                href={process.env.REACT_APP_MAIN_URL+"/auth/register/mbi/"+code}
+                                href={process.env.REACT_APP_MAIN_URL + "/auth/register/mbi/" + code}
                                 rel="questionnaire"
                                 variant="body2"
                                 sx={{ mb: 2 }}
@@ -102,7 +128,7 @@ const Questionnaire = () => {
                         </>
                     );
                     //TODO go to registration page with code
-                    window.location.href = process.env.REACT_APP_MAIN_URL+"/auth/register/mbi/"+code;
+                    window.location.href = process.env.REACT_APP_MAIN_URL + "/auth/register/mbi/" + code;
                     console.log("redirect to registration");
                 }
             } else {
@@ -125,27 +151,13 @@ const Questionnaire = () => {
     };
 
     useEffect(() => {
+        //console.log('useef');
         init();
     }, []);
-    const isPreviousQuestionsAnswered = (item, formvalues) => {
-        let fields = item.fields;
-        if (!fields && item.groups) item.groups.forEach(group => { fields = [...fields, ...group.fields] });
-        if (!fields) return false;
-        if (fields.length == 0) return true;
-        return fields.every(el => formvalues[el.name] ? true : false);
-    }
 
-    const isLastStep = (formvalues) => {
-        if (step === (questions.length - 1)) return true;
-        if (questions[step].submit_if_any) {
-            return Object.keys(questions[step].submit_if_any).some(key => {
-                return formvalues[key] === questions[step].submit_if_any[key];
-            });
-        }
-        return false;
-    }
 
-    const renderField = (field, formvalues) => {
+    const renderField = (field, formvalues,formref) => {
+        //console.log('renderField');
         if (field.show_if) {
             let show = Object.keys(field.show_if).every(key => {
                 return formvalues[key] === field.show_if[key];
@@ -169,24 +181,24 @@ const Questionnaire = () => {
         }
         switch (field.type) {
             case 'datepicker':
-                return <StaticDatePickerField 
-                        name={field.name} 
-                        disabled={(field.disable_if_present && questionnaireData?.questionnaire && questionnaireData.questionnaire[field.name])?true:false}
-                        {...field.props} />;
+                return <StaticDatePickerField
+                    name={field.name}
+                    disabled={(field.disable_if_present && questionnaireData?.questionnaire && questionnaireData.questionnaire[field.name]) ? true : false}
+                    {...field.props} />;
             case 'switch':
-                return <SwitchField 
-                        name={field.name} 
-                        label={field.label}  
-                        {...field.props} 
-                        disabled={(field.disable_if_present && questionnaireData?.questionnaire && questionnaireData.questionnaire[field.name])?true:false}
-                        />
+                return <SwitchField
+                    name={field.name}
+                    label={field.label}
+                    {...field.props}
+                    disabled={(field.disable_if_present && questionnaireData?.questionnaire && questionnaireData.questionnaire[field.name]) ? true : false}
+                />
             case 'toggle':
                 return (
                     <ToggleGroupField
                         name={field.name}
                         exclusive={field.exclisive !== false ? true : false}
                         choices={choices}
-                        disabled={(field.disable_if_present && questionnaireData?.questionnaire && questionnaireData.questionnaire[field.name])?true:false}
+                        disabled={(field.disable_if_present && questionnaireData?.questionnaire && questionnaireData.questionnaire[field.name]) ? true : false}
                         {...field.props}
                     />
                 )
@@ -201,28 +213,30 @@ const Questionnaire = () => {
                     name={field.name}
                     choices={choices}
                     otherChoices={additional_choices}
-                    disabled={(field.disable_if_present && questionnaireData?.questionnaire && questionnaireData.questionnaire[field.name])?true:false}
+                    disabled={(field.disable_if_present && questionnaireData?.questionnaire && questionnaireData.questionnaire[field.name]) ? true : false}
                     {...field.props}
                 />
             case 'county_selector':
-                return <CountySelector 
-                        name={field.name} 
-                        label={field.label} 
-                        preloaded_counties={questionnaireData?.counties}
-                        disabled={(field.disable_if_present && questionnaireData?.questionnaire && questionnaireData.questionnaire[field.name])?true:false}
-                        />
+                return <CountySelector
+                    name={field.name}
+                    label={field.label}
+                    preloaded_counties={questionnaireData?.counties||[]}
+                    formref={formref}
+                    map_modal={true}
+                    disabled={(field.disable_if_present && questionnaireData?.questionnaire && questionnaireData.questionnaire[field.name]) ? true : false}
+                />;
             case 'number':
                 return <NumberField
                     name={field.name}
                     label={field.label}
-                    disabled={(field.disable_if_present && questionnaireData?.questionnaire && questionnaireData.questionnaire[field.name])?true:false}
+                    disabled={(field.disable_if_present && questionnaireData?.questionnaire && questionnaireData.questionnaire[field.name]) ? true : false}
                     {...field.props}
                 />
             case 'text':
                 return <InputField
                     name={field.name}
                     label={field.label}
-                    disabled={(field.disable_if_present && questionnaireData?.questionnaire && questionnaireData.questionnaire[field.name])?true:false}
+                    disabled={(field.disable_if_present && questionnaireData?.questionnaire && questionnaireData.questionnaire[field.name]) ? true : false}
                     {...field.props} />
             default:
                 console.warn("Field type " + field.type + " not found for field " + field.name);
@@ -252,10 +266,55 @@ const Questionnaire = () => {
         });
         return validation;
     }
+    const isPreviousQuestionsAnswered = (item, formvalues) => {
+        let fields = item.fields;
+        if (!fields && item.groups) item.groups.forEach(group => { fields = [...fields, ...group.fields] });
+        if (!fields) return false;
+        if (fields?.length === 0) return true;
+        return fields.every(el => formvalues[el.name] ? true : false);
+    }
+
+    const isLastStep = (formvalues) => {
+        if (step === (questions?.length - 1)) return true;
+        if (lender_id && step == 0) return false; //we have to ask for contact information in case we don't have questionnaire code
+        if (questions[step].submit_if_any) {
+            return Object.keys(questions[step].submit_if_any).some(key => {
+                return formvalues[key] === questions[step].submit_if_any[key];
+            });
+        }
+        return false;
+    }
+
+    const goNext = (formvalues) => {
+        if (step == 0 && lender_id) {
+            let reinvesting = !Object.keys(questions[0].submit_if_any || []).some(key => {
+                return formvalues[key] === questions[0].submit_if_any[key];
+            });
+            if (!reinvesting)
+                //questions SHOULD contain field with name 'contacts'!!!
+                setStep(questions.findIndex((el => el.name == 'contacts')));
+            else
+                setStep(step + 1);
+        } else
+            setStep(step + 1);
+    }
+
+    const goBack = (formvalues) => {
+        if (lender_id && step == questions.findIndex((el => el.name == 'contacts'))) {
+            let reinvesting = !Object.keys(questions[0].submit_if_any || []).some(key => {
+                return formvalues[key] === questions[0].submit_if_any[key];
+            });
+            if (!reinvesting)
+                setStep(0);
+            else
+                setStep(step - 1);
+        } else
+            setStep(step - 1);
+    }
 
     const onSubmit = async (values, setSubmitting) => {
         let data = { ...values };
-        if (data.counties && data.counties.length) data.counties = data.counties.map((loc => loc.id));
+        if (data.counties && data.counties?.length) data.counties = data.counties.map((loc => loc.id));
         if (data.payoff_reason === 'REFINANCE') data.reinvesting = false;
         allfields.forEach(field => {
             if (field.type === "datepicker") {
@@ -266,19 +325,19 @@ const Questionnaire = () => {
                 //console.log("changed " + field.name + " to date", data[field.name]);
             }
         });
-        if (!questionnaireData.questionnaire && code.substring(0,2)=='l/') { //external questionnaire by lender_id
-            data.lender_id=code.substring(2);
+        if (!questionnaireData.questionnaire && lender_id) { //external questionnaire by lender_id
+            data.lender_id = lender_id;
         } else
             data.code = questionnaireData.questionnaire?.code || questionnaireData.questionnaire?.code_for_copy;
         setSubmitting(true);
         try {
             console.log("submitting", data);
-            const res =await submitQuestionnaire(data);
-            
+            const res = await submitQuestionnaire(data);
+
             if (data.reinvesting) {
                 setLoading(true);
-                console.log("redirect_code",res);
-                window.location.href = process.env.REACT_APP_MAIN_URL+"/auth/register/mbi/"+res.redirect_code;
+                console.log("redirect_code", res);
+                window.location.href = process.env.REACT_APP_MAIN_URL + "/auth/register/mbi/" + res.redirect_code;
             } else {
                 setQuestionnaireNotification(<>
                     <h1>Thank you</h1>
@@ -337,18 +396,13 @@ const Questionnaire = () => {
                             </Box>
                         </DialogTitle>
                         <DialogContent>
-                            {questions[step]?.notice &&
-                                <Paper className={classes.dialogSubtitlePaper}>
-                                    <DialogContentText dangerouslySetInnerHTML={{ __html: questions[step]?.notice }} />
-                                </Paper>
-                            }
                             <Formik
                                 enableReinitialize
                                 validateForm
                                 validateOnMount
                                 innerRef={formEl}
                                 onSubmit={onSubmit}
-                                initialValues={allfields.reduce((a, v) => ({ ...a, [v.name]: (questionnaireData?.questionnaire?questionnaireData?.questionnaire[v.name]:null) || (v.initial_value !== undefined ? v.initial_value : "") }), {})}
+                                initialValues={allfields.reduce((a, v) => ({ ...a, [v.name]: (questionnaireData?.questionnaire ? questionnaireData?.questionnaire[v.name] : null) || (v.initial_value !== undefined ? v.initial_value : "") }), {})}
                                 validationSchema={Yup.object().shape(questions[step]?.columns?.reduce((a, v) => {
                                     let rules = {};
                                     v.fields?.forEach(field => {
@@ -368,6 +422,11 @@ const Questionnaire = () => {
                             >
                                 {({ isSubmitting, setSubmitting, values, isValid, errors }) => (
                                     <Form ref={formEl}>
+                                        {questions[step]?.notice && !(questions[step]?.hide_notice_if_last_step && isLastStep(values)) &&
+                                            <Paper className={classes.dialogSubtitlePaper}>
+                                                <DialogContentText dangerouslySetInnerHTML={{ __html: questions[step]?.notice }} />
+                                            </Paper>
+                                        }
                                         <Box sx={{ mt: 2 }} />
 
                                         <Grid container direction='row' {...questions[step]?.grid_props}>
@@ -376,7 +435,7 @@ const Questionnaire = () => {
                                                 if (hide) hide = !isPreviousQuestionsAnswered(questions[step]?.columns[key - 1], values);
                                                 if (hide) return '';
                                                 return (
-                                                    <Grid item key={key} xs={12} md={12 / (questions[step]?.columns.length || 1)} sx={{ p: 1 }} className={col.hide_before_previous ? classes.hoverItem : ''}>
+                                                    <Grid item key={key} xs={12} md={12 / (questions[step]?.columns?.length || 1)} sx={{ p: 1 }} className={col.hide_before_previous ? classes.hoverItem : ''}>
                                                         {col.title &&
                                                             <Typography variant='h5' style={{ marginBottom: '16px' }}>{col.title}</Typography>
                                                         }
@@ -389,7 +448,7 @@ const Questionnaire = () => {
                                                         >
                                                             {col?.fields?.map((field, fk) => (
                                                                 <Grid item key={fk} xs={field.grid_props?.xs || 12}  {...field.grid_props}>
-                                                                    {renderField(field, values)}
+                                                                    {renderField(field, values,formEl)}
                                                                 </Grid>
                                                             ))}
                                                             {col?.groups?.map((group, kg) => (
@@ -407,7 +466,7 @@ const Questionnaire = () => {
                                                                         >
                                                                             {group?.fields?.map((field, fk) => (
                                                                                 <Grid item key={fk} xs={field.grid_props?.xs || 12} {...field.grid_props}>
-                                                                                    {renderField(field, values)}
+                                                                                    {renderField(field, values,formEl)}
                                                                                 </Grid>
                                                                             ))}
                                                                         </Grid>
@@ -432,9 +491,9 @@ const Questionnaire = () => {
                                                     justifyContent="flex-start"
                                                     alignItems="center"
                                                 >
-                                                    {step != 0 &&
+                                                    {step !== 0 &&
                                                         <Button
-                                                            onClick={() => { setStep(step - 1) }}
+                                                            onClick={() => { goBack(values) }}
                                                             className={classes.button}
                                                             variant="outlined"
                                                             style={{ backgroundColor: 'rgba(255, 255, 255, 0.4)' }}
@@ -470,7 +529,7 @@ const Questionnaire = () => {
                                                     fullWidth
                                                 >
                                                     <Button
-                                                        onClick={() => { if (!isLastStep(values)) setStep(step + 1); else onSubmit(values, setSubmitting) }}
+                                                        onClick={() => { if (!isLastStep(values)) goNext(values); else onSubmit(values, setSubmitting) }}
                                                         disabled={isSubmitting || !isValid}
                                                         type={'button'}
                                                         style={{ backgroundColor: 'rgba(255, 255, 255, 0.4)' }}
@@ -493,7 +552,6 @@ const Questionnaire = () => {
                                                 </Box>
                                             </Grid>
                                         </Grid>
-
                                     </Form>
                                 )}
                             </Formik>
