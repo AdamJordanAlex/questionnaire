@@ -4,27 +4,8 @@ import { useRef, useEffect, useState, forwardRef, createContext, useContext, Com
 import CloseIcon from '@mui/icons-material/Close';
 import { getCounties, getIPinfo } from "../../api/API";
 import { useTheme } from '@mui/material/styles';
-import { makeStyles, withStyles } from '@mui/styles';
 import { VariableSizeList } from 'react-window';
 
-const useStyles = makeStyles({
-    map_container: {
-        position: "relative",
-        minHeight: '300px',
-        '&::before': {
-            content: '"Loading map ...."',
-            color: "#666262",
-            top: '100px',
-            position: "absolute",
-            width: "100%",
-            textAlign: "center"
-        }
-    },
-    map: {
-        minHeight: '300px',
-    }
-
-});
 
 var map;
 var selectedCounties = [];
@@ -32,7 +13,7 @@ var selectedCounties = [];
 const MyMapComponent = (props) => {
     const { selected, setSelected, counties } = props;
     const ref = useRef();
-    const classes = useStyles();
+
 
     const chooseCounty = (event) => {
         let county = counties[event.featureData?.id];
@@ -93,7 +74,6 @@ const MyMapComponent = (props) => {
             }
         });
         removeManyCounties(counties_to_remove);
-        console.log(3);
         selected?.forEach(el => {
             if (selectedCounties.findIndex(val => val.id === el.id) < 0) {
                 //console.log("selecting " + el.id + " from ", selectedCounties);
@@ -164,12 +144,12 @@ const MyMapComponent = (props) => {
     }, [counties]);
 
     useEffect(() => {
-       if (map) onValueChanged();
+        if (map) onValueChanged();
     }, [selected]);
 
 
 
-    return <div ref={ref} id="map" className={classes.map} />;
+    return <div ref={ref} id="map" style={{minHeight: '300px'}} />;
 }
 
 
@@ -227,7 +207,7 @@ const ListboxComponent = forwardRef(function ListboxComponent(props, ref) {
         );
     }
 
-    const itemCount = itemData?.length ||0;
+    const itemCount = itemData?.length || 0;
     const itemSize = smUp ? 36 : 48;
 
     const getChildSize = (child) => {
@@ -283,13 +263,10 @@ class CountySelector extends Component {
     //TODO load counties if not pre-loaded
 
     handleChange(event, newValue) {
-        //console.log("trying to handle change",newValue);
         this.setSelected(newValue);
     }
 
     setSelected(newValue) {
-        //console.log(this.props.formref?.current?.values[this.props.name]);
-        //console.log(this.props.formref?.current);
         this.props.formref?.current?.setFieldValue(
             this.props.name, newValue
         );
@@ -337,7 +314,18 @@ class CountySelector extends Component {
                         sx={{ maxHeight: '6em', overflow: 'auto' }}
                     />
                     {!this.props.map_modal ?
-                        <Box className={this.props.classes.map_container}>
+                        <Box style={{
+                            position: "relative",
+                            minHeight: '300px',
+                            '&::before': {
+                                content: '"Loading map ...."',
+                                color: "#666262",
+                                top: '100px',
+                                position: "absolute",
+                                width: "100%",
+                                textAlign: "center"
+                            }
+                        }}>
                             <Wrapper apiKey={process.env.REACT_APP_GOOGLE_MAP_API_KEY} render={this.renderWrapperStatus} >
                                 <MyMapComponent counties={this.state.counties} selected={this.props?.formref?.current?.values[this.props.name] || []} setSelected={this.setSelected.bind(this)} />
                             </Wrapper>
@@ -347,7 +335,7 @@ class CountySelector extends Component {
                             <Button size="small" onClick={() => this.setState({ modalOpen: true })} >Choose on map</Button>
                         </Box>
                     }
-                    {this.props.map_modal && 
+                    {this.props.map_modal &&
                         <Dialog
                             open={this.state.modalOpen}
                             onClose={() => { this.setState({ modalOpen: false }) }}
@@ -371,13 +359,24 @@ class CountySelector extends Component {
                                 ><CloseIcon /></IconButton>
                             </DialogTitle>
                             <DialogContent>
-                                <Box className={this.props.classes.map_container}>
+                                <Box style={{
+                                    position: "relative",
+                                    minHeight: '300px',
+                                    '&::before': {
+                                        content: '"Loading map ...."',
+                                        color: "#666262",
+                                        top: '100px',
+                                        position: "absolute",
+                                        width: "100%",
+                                        textAlign: "center"
+                                    }
+                                }}>
                                     <Wrapper apiKey={process.env.REACT_APP_GOOGLE_MAP_API_KEY} render={this.renderWrapperStatus} >
                                         <MyMapComponent counties={this.state.counties} selected={this.props?.formref?.current?.values[this.props.name] || []} setSelected={this.setSelected.bind(this)} />
                                     </Wrapper>
                                 </Box>
                             </DialogContent>
-                            <DialogActions sx={{pr:3,pb:2}}>
+                            <DialogActions sx={{ pr: 3, pb: 2 }}>
                                 <Button color="primary" variant={"outlined"} autoFocus onClick={() => { this.setState({ modalOpen: false }) }}>
                                     OK
                                 </Button>
@@ -391,4 +390,4 @@ class CountySelector extends Component {
     }
 }
 
-export default withStyles(useStyles)(CountySelector);
+export default CountySelector;

@@ -156,7 +156,7 @@ const Questionnaire = () => {
     }, []);
 
 
-    const renderField = (field, formvalues,formref) => {
+    const renderField = (field, formvalues,formref,setFieldValue) => {
         //console.log('renderField');
         if (field.show_if) {
             let show = Object.keys(field.show_if).every(key => {
@@ -222,7 +222,6 @@ const Questionnaire = () => {
                     label={field.label}
                     preloaded_counties={questionnaireData?.counties||[]}
                     formref={formref}
-                    map_modal={true}
                     disabled={(field.disable_if_present && questionnaireData?.questionnaire && questionnaireData.questionnaire[field.name]) ? true : false}
                 />;
             case 'number':
@@ -420,7 +419,7 @@ const Questionnaire = () => {
                                     return { ...a, ...rules };
                                 }, {}))}
                             >
-                                {({ isSubmitting, setSubmitting, values, isValid, errors }) => (
+                                {({ isSubmitting, setSubmitting, values, isValid, errors,setFieldValue }) => (
                                     <Form ref={formEl}>
                                         {questions[step]?.notice && !(questions[step]?.hide_notice_if_last_step && isLastStep(values)) &&
                                             <Paper className={classes.dialogSubtitlePaper}>
