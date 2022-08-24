@@ -30,6 +30,9 @@ export default makeStyles(theme => ({
     backdropFilter: 'blur(10px)',
     backgroundColor: 'rgba(20, 40, 30,  .6)'
   },
+  backDropEmbedded: {
+    background: 'transparent',
+  },
   dialogSubtitlePaper: {
     padding: '15px',
     margin: '20px',

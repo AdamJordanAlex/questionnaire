@@ -1,6 +1,7 @@
 [
     {
         "subtitle": "<span style='font-weight: 500;'>We are in receipt of your payoff request and will respond shortly. To help serve you better, please provide the following</span>",
+        "subtitle_external": "<span style='font-weight: 500;'>In anticipation of your upcoming loan maturity, and to help serve you better, please provide the following.</span>",
         "name": "expected_payoff",
         "columns": [
             {
