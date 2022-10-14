@@ -101,7 +101,7 @@ const Questionnaire = () => {
             setLender(data?.questionnaire?.organization);
             //console.log(data);
             if (data?.questionnaire?.status === 'completed') {
-                if (data.user_exists)
+                if (data.user_exists) /**TODO show notification on login page that account exists */
                     setQuestionnaireNotification(
                         <>
                             <h1>This form has been submitted</h1>
@@ -114,7 +114,7 @@ const Questionnaire = () => {
                             >GO TO DASHBOARD</Link>
                         </>
                     );
-                else {
+                else if (data?.questionnaire?.reinvesting) {
                     setQuestionnaireNotification(
                         <>
                             <h1>This form has been submitted</h1>
@@ -127,9 +127,14 @@ const Questionnaire = () => {
                             >SET UP YOUR ACCOUNT</Link>
                         </>
                     );
-                    //TODO go to registration page with code
                     window.location.href = process.env.REACT_APP_MAIN_URL + "/auth/register/mbi/" + code;
                     console.log("redirect to registration");
+                } else {
+                    setQuestionnaireNotification(
+                        <>
+                            <h1>This form has been submitted</h1>
+                        </>
+                    );
                 }
             } else {
                 data.questionnaire.primary_email = data.questionnaire?.email;//to prefill contact form

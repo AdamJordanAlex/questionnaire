@@ -1,16 +1,62 @@
-const URL='http://localhost:3000';
-const LENDER_ID="rJwMYHFUts";
-const QUESTIONNAIRE_ID="96a30cb0-3dcb-4eb5-82a1-2a82e374dedc";
-const EMAIL='johndoe@notexistedgmail.com';
+const SERVER_URL = "http://localhost:1338";
+var OPTIONS = {EMAILS:[]};
 
-describe('Full questionnaire flow by lender link', () => {
+describe('Questionnaire by lender ID', () => {
     before(() => {
-      //cy.visit(URL+"/l/"+LENDER_ID);
-      cy.visit(URL+"/"+QUESTIONNAIRE_ID);
-      cy.waitForReact();
-      //cy.waitForReact(5000, '#root');
-    })
+        cy.request("POST",SERVER_URL+'/api/functions/get_ui_testing_options').then(res=> OPTIONS=res.body.result)
+    });
 
+    it('visit target 1 (no reinvest)',()=>{
+        cy.visit(`${OPTIONS.QUESTIONNAIRE_URL}/l/${OPTIONS.LENDER_ID}`);
+        cy.waitForReact();
+    });
+
+    //NO REINVEST    
+    it('first page', () => {
+        cy.get('#next_btn').should('have.text', 'NEXT');
+        cy.get('.MuiCalendarPicker-root').should('have.length', '1');
+        cy.get('div[name="payoff_reason_group"]').should('not.exist');
+        cy.get('input[name="reinvesting"]').should('not.exist');
+    
+        //choosing last day of current month
+        cy.get('.MuiCalendarPicker-root button').last().click();
+        cy.get('div[name="payoff_reason_group"]').should('exist');
+    
+        //choosing refinance
+        cy.get('[value="REFINANCE"]').click();
+        cy.get('input[name="reinvesting"]').should('not.exist');
+    
+        //choosing property_sale
+        cy.get('[value="PROPERTY_SALE"]').click();
+        cy.get('input[name="reinvesting"]').should('exist');
+        cy.get('#next_btn').should('have.text', 'NEXT');
+    
+        //choosing not to reinvest
+        cy.get('input[name="reinvesting"]').click();    
+        cy.get('#next_btn').click();
+
+    })
+    it('second page', () => {
+        cy.get('.MuiBox-root > .MuiTypography-root').should('have.text', 'Contact information');
+        //cy.get('#next_btn').should('be.disabled');
+        cy.get('input').should('have.length', '5');
+        cy.get('#\\:r3\\:').type("John");
+        cy.get('#\\:r5\\:').type("Doe");
+        cy.get('#\\:r7\\:').type(OPTIONS.EMAILS[0]);
+        cy.get('#\\:r9\\:').type("0000000000");
+        cy.get('#next_btn').should('not.be.disabled');
+        cy.get('#next_btn').should('have.text', 'SUBMIT');
+        cy.get('#next_btn').click();
+    });
+    it('third page', () => {
+        cy.get('h1').should('have.text', 'Thank you');
+    });
+
+    //REINVEST    
+    it('visit target 2 (reinvest)',()=>{
+        cy.visit(`${OPTIONS.QUESTIONNAIRE_URL}/l/${OPTIONS.LENDER_ID}`);
+        cy.waitForReact();
+    });
     it('first page', () => {
         cy.get('#next_btn').should('be.disabled');
         //choosing last day of current month
@@ -24,7 +70,7 @@ describe('Full questionnaire flow by lender link', () => {
         cy.get('#next_btn').click();
     });
 
-    it('second page',() => {
+    it('second page', () => {
         cy.get('.MuiBox-root > .MuiTypography-root').should('have.text', 'Reinvestment Preference');
         cy.get('#next_btn').should('be.disabled');
         //choosing direct ownership
@@ -36,7 +82,7 @@ describe('Full questionnaire flow by lender link', () => {
         cy.get('#next_btn').click();
     });
 
-    it('third page',() => {
+    it('third page', () => {
         cy.wait(1000);
         cy.get('.MuiTypography-h4').should('have.text', 'Location Preference');
         //cy.get('#next_btn').should('be.disabled');
@@ -57,7 +103,7 @@ describe('Full questionnaire flow by lender link', () => {
         cy.get('#next_btn').click();
     });
 
-    it('fourth page',() => {
+    it('fourth page', () => {
         cy.get('.MuiBox-root > .MuiTypography-root').should('have.text', 'Property Value and Equity');
         //cy.get('#next_btn').should('be.disabled');
         cy.get('input').should('have.length', '3');
@@ -69,21 +115,26 @@ describe('Full questionnaire flow by lender link', () => {
         cy.get('#next_btn').click();
     });
 
-    it('fifth page',()=>{
+    it('fifth page', () => {
         cy.get('.MuiBox-root > .MuiTypography-root').should('have.text', 'Contact information');
         //cy.get('#next_btn').should('be.disabled');
         cy.get('input').should('have.length', '5');
-        //cy.get('#\\:rd\\:').type("John");
-        //cy.get('#\\:rf\\:').type("Doe");
-        //cy.get('#\\:rh\\:').type(EMAIL);
+        cy.get('#\\:rd\\:').type("John");
+        cy.get('#\\:rf\\:').type("Doe");
+        cy.get('#\\:rh\\:').type(OPTIONS.EMAILS[1]);
         cy.get('#\\:rj\\:').type("0000000000");
         cy.get('#next_btn').should('not.be.disabled');
         cy.get('#next_btn').click();
     });
-    it('sixth page',()=>{
+    it('sixth page', () => {
         //cy.get('.MuiBox-root > .MuiTypography-root').should('have.text', 'Contact information');
         cy.get('#next_btn').should('not.be.disabled');
         cy.get('#next_btn').should('have.text', 'SUBMIT');
+        cy.get('#next_btn').click();
+    });
 
+    after(() => {
+        cy.wait(3000);
+        cy.request("POST",SERVER_URL+'/api/functions/clean_after_ui_testing');
     });
 });

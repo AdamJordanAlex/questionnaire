@@ -4,6 +4,8 @@ import { createCustomTheme } from './theme';
 import { Toaster } from 'react-hot-toast';
 import { Routes, Route } from "react-router-dom";
 import NotFound from './questionnaire/NotFound';
+import ReactGA from 'react-ga';
+import { useEffect } from 'react';
 
 function App() {
   const theme = createCustomTheme({
@@ -12,6 +14,12 @@ function App() {
     roundedCorners: true,
     theme: 'LIGHT'
   });
+
+  if (process.env.REACT_APP_GOOGLE_TRACKING_ID) ReactGA.initialize(process.env.REACT_APP_GOOGLE_TRACKING_ID);
+
+  useEffect(() => {
+    if (process.env.REACT_APP_GOOGLE_TRACKING_ID) ReactGA.pageview(window.location.pathname + window.location.search);
+  }, []);
   
   return (
     <ThemeProvider theme={theme}>
