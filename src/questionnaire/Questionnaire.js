@@ -9,7 +9,7 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import HelpIcon from '@mui/icons-material/Help';
 import CheckIcon from '@mui/icons-material/Check';
-import CountySelector from './fields/CountySelector';
+import GeoSelector2 from './fields/GeoSelector2';
 import StaticDatePickerField from './fields/StaticDatePickerField';
 import ToggleGroupField from './fields/ToggleGroupField';
 import MultiSelectButtonsField from './fields/MultiSelectButtonsField';
@@ -222,13 +222,10 @@ const Questionnaire = () => {
                     {...field.props}
                 />
             case 'county_selector':
-                return <CountySelector
+                  return <GeoSelector2 
                     name={field.name}
                     label={field.label}
-                    preloaded_counties={questionnaireData?.counties || []}
-                    formref={formref}
-                    disabled={(field.disable_if_present && questionnaireData?.questionnaire && questionnaireData.questionnaire[field.name]) ? true : false}
-                />;
+                  />
             case 'number':
                 return <NumberField
                     name={field.name}
@@ -301,6 +298,7 @@ const Questionnaire = () => {
                 setStep(step + 1);
         } else
             setStep(step + 1);
+        console.log(formvalues)
     }
 
     const goBack = (formvalues) => {

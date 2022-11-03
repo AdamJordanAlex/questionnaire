@@ -9,7 +9,7 @@ import { VariableSizeList } from 'react-window';
 
 var map;
 var selectedCounties = [];
-
+/** DON'T NEED THESE - REMOVE */
 const MyMapComponent = (props) => {
     const { selected, setSelected, counties } = props;
     const ref = useRef();

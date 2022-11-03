@@ -38,7 +38,7 @@ export const api = (addParseHeader=true) => {
 
 export const getQuestionnaire = async (code)=>{
   try {
-      const response=await api().post(process.env.REACT_APP_PARSE_URL + '/functions/get_questionnaire',{code,include_counties:true});
+      const response=await api().post(process.env.REACT_APP_PARSE_URL + '/functions/get_questionnaire',{code,include_counties:process.env.REACT_APP_PRELOAD_COUNTIES=="true"?true:false});
       return response.data.result;
   } catch (error) {
       return handleStatusCode(error);
@@ -47,7 +47,7 @@ export const getQuestionnaire = async (code)=>{
 
 export const getQuestionnaireOptionsByLender = async (lender_id)=>{
   try {
-      const response=await api().post(process.env.REACT_APP_PARSE_URL + '/functions/get_questionnaire_options',{lender_id,include_counties:true});
+      const response=await api().post(process.env.REACT_APP_PARSE_URL + '/functions/get_questionnaire_options',{lender_id,include_counties:process.env.REACT_APP_PRELOAD_COUNTIES=="true"?true:false});
       return response.data.result;
   } catch (error) {
       return handleStatusCode(error);
@@ -79,6 +79,29 @@ export const getCounties = async () => {
     const { status } = response;
     handleStatusCode({ status_code: status });
     return response.data?.results||[]
+  } catch (error) {
+    return handleStatusCode(error);
+  }
+}
+
+export const getCountyByCoords = async (lat,lng) => {
+  try {
+    const response = await api().get(process.env.REACT_APP_PARSE_URL + '/classes/county?limit=1&where={"area": { "$nearSphere": {"__type": "GeoPoint","latitude": '+lat+',"longitude": '+lng+'},"$maxDistanceInMiles": 10.0}}');
+    //console.log(response);
+    const { status } = response;
+    handleStatusCode({ status_code: status });
+    return response.data?.results||[]
+  } catch (error) {
+    return handleStatusCode(error);
+  }
+}
+
+export const getPredictions = async (search) =>{
+  try {
+    const response = await api().post(process.env.REACT_APP_PARSE_URL + '/functions/fetch_geopredictions',{search});
+    const { status } = response;
+    handleStatusCode({ status_code: status });
+    return response.data?.result||[]
   } catch (error) {
     return handleStatusCode(error);
   }

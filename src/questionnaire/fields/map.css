@@ -1,0 +1,7 @@
+.gmnoprint>div>button[title="Stop drawing"]>span>div:after {
+    content: url("./pointer.png") !important;
+}
+
+.gmnoprint>div>button[title="Stop drawing"]>span>div>img {
+    display: none !important;
+}
