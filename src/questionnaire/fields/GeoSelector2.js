@@ -188,9 +188,9 @@ export default function GeoSelector2(props) {
             renderOption={renderOption}
             getOptionDisabled={(option)=>getOptionDisabled(option,field.value)}
           />
-          {/*<Box sx={{ textAlign: "right" }}>
+          <Box sx={{ textAlign: "right" }}>
             <Button size="small" onClick={()=>{setMapOpen(true)}} >Choose on map</Button>
-            </Box>*/}
+          </Box>
           <Dialog
             open={mapOpen}
             onClose={()=>{setMapOpen(false)}}

@@ -298,7 +298,7 @@ const Questionnaire = () => {
                 setStep(step + 1);
         } else
             setStep(step + 1);
-        console.log(formvalues)
+        //console.log(formvalues)
     }
 
     const goBack = (formvalues) => {
@@ -366,6 +366,24 @@ const Questionnaire = () => {
         setSubmitting(false);
     }
 
+    const replaceVariables = (text) =>{
+        const getValue=(m, key )=>{
+            console.log(key);
+            let v = key.split("|");
+            let parts = v[0].split(".");
+            let result=parts[0]=='lender'?lender:questionnaireData;
+            for (var i=1;i<parts.length;i++) {
+                console.log(i+":",result);
+                if (result) result=result[parts[i]];
+            }
+            if (!result) result=v[1] || ""; //default value or blank
+            console.log(result);
+            return result;
+        }
+        return text.replace( /%(.+?)%/g, getValue);
+        return text;
+    }
+
     return (
         <>
             <Dialog
@@ -405,13 +423,13 @@ const Questionnaire = () => {
                                     />
                                 }
                                 {questions[step]?.title &&
-                                    <Typography variant='h4'>{questions[step].title}</Typography>
+                                    <Typography variant='h4'>{replaceVariables(questions[step].title)}</Typography>
                                 }
                                 {questions[step]?.subtitle_external && lender_id ?
-                                    <Typography variant='p' style={{ marginBottom: '5px' }} dangerouslySetInnerHTML={{ __html: questions[step]?.subtitle_external}} />
+                                    <Typography variant='p' style={{ marginBottom: '5px' }} dangerouslySetInnerHTML={{ __html: replaceVariables(questions[step]?.subtitle_external)}} />
                                     :<>
                                     {questions[step]?.subtitle &&
-                                        <Typography variant='p' style={{ marginBottom: '5px' }} dangerouslySetInnerHTML={{ __html: questions[step]?.subtitle }} />
+                                        <Typography variant='p' style={{ marginBottom: '5px' }} dangerouslySetInnerHTML={{ __html: replaceVariables(questions[step]?.subtitle) }} />
                                     }
                                     </>
                                 }
@@ -446,7 +464,7 @@ const Questionnaire = () => {
                                     <DialogContent >
                                         {questions[step]?.notice && !(questions[step]?.hide_notice_if_last_step && isLastStep(values)) &&
                                             <Paper className={classes.dialogSubtitlePaper}>
-                                                <DialogContentText dangerouslySetInnerHTML={{ __html: questions[step]?.notice }} />
+                                                <DialogContentText dangerouslySetInnerHTML={{ __html: replaceVariables(questions[step]?.notice) }} />
                                             </Paper>
                                         }
                                         <Box sx={{ mt: 2 }} />

@@ -370,7 +370,7 @@
     {
         "title": "Review",
         "name": "review",
-        "notice": "Of Benefit:<br /> NxtCRe is a unique CRE transaction matching service which partners with financial institutions across the nation. Referred investors like you are able to anonymously receive custom-matched opportunities listed by sellers. If an opportunity appeals to you, you may then allow the seller to contact you and proceed as you wish. You have full control and your privacy is protected. <br /><br /> You can learn more by viewing <a href='https://nxtcre.com/frequently-asked-questions/' target='_blank'>Frequently Asked Questions</a>, or by visiting our website <a href='https://nxtcre.com' target='_blank'>nxtcre.com</a>. We hope this valuable service is helpful, and we look forward to assisting you in your investing and financing needs.",
+        "notice": "Of Benefit:<br /> NxtCRe is a unique CRE transaction matching service which partners with financial institutions across the nation. Referred investors like you are able to anonymously receive custom-matched opportunities listed by sellers. If an opportunity appeals to you, you may then allow the seller to contact you and proceed as you wish. You have full control and your privacy is protected. <br /><br /> You can learn more by viewing <a href='https://nxtcre.com/frequently-asked-questions/' target='_blank'>Frequently Asked Questions</a>, or by visiting our website <a href='%lender.settings.mbi_landing_page|https://nxtcre.com%' target='_blank'>nxtcre.com</a>. We hope this valuable service is helpful, and we look forward to assisting you in your investing and financing needs.",
         "grid_props": {
             "style": {
                 "paddingLeft": "20px",

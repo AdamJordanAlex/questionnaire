@@ -117,7 +117,6 @@ const MyMapComponent = (props) => {
                 default:
                     console.log("UNKNOW DRAWTYPE-" + event.type)
             }
-            //TODO SHOW NAME
             if (event.type !== 'marker')
                 window.google.maps.event.addListener(event.overlay, 'click', function () {
                     removeElement(el, event.overlay);
@@ -126,7 +125,6 @@ const MyMapComponent = (props) => {
         drawingManager.setMap(map);
     }
 
-    //TODO SHOW NAME
     const addElementByCoords = async (lat, lng) => {
         let counties = await getCountyByCoords(lat, lng);
         if (counties && counties.length) {
