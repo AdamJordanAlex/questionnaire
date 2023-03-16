@@ -83,7 +83,7 @@
     {
         "title": "Reinvestment Preference",
         "name": "preference",
-        "notice": "We are able to offer you confidential access to opportunities that custom-match your buying needs. These include off-market and distressed opportunites that otherwise may not be available to you. There is no cost to you for this service, provided via our trusted partner nxtCRE, and your privacy and information are confidential and secure.",
+        "notice": "We are able to offer you confidential access to opportunities that custom-match your buying needs. These include off-market and distressed opportunites that otherwise may not be available to you. There is no cost to you for this service, provided via our trusted partner nxtCRE, and your privacy and information are confidential and secure. To learn more, please click <a href='%lender.settings.mbi_landing_page|https://nxtcre.com%' target='_blank'>here</a>.",
         "columns": [
             {
                 "title": "Investment Structure",

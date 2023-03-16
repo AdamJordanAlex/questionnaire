@@ -107,6 +107,14 @@ export const getPredictions = async (search) =>{
   }
 }
 
+export const saveError = async(text,data,type="error",user) =>{
+  try {
+    await api().post(process.env.REACT_APP_PARSE_URL + '/classes/frontlog',{type,text,user,url: window.location.href,data });
+  } catch (error) {
+    console.log("ERR",error);
+  }
+}
+
 export const handleStatusCode = (error) => {
   if (error.name === "AxiosError") error = error?.response?.data;
   switch (error?.response?.status || error?.status_code || error?.code) {

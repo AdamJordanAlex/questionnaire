@@ -6,6 +6,7 @@ import { Routes, Route } from "react-router-dom";
 import NotFound from './questionnaire/NotFound';
 import ReactGA from 'react-ga';
 import { useEffect } from 'react';
+require('./console');
 
 function App() {
   const theme = createCustomTheme({
