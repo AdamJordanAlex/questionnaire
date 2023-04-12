@@ -3,7 +3,7 @@ var OPTIONS = {EMAILS:[]};
 
 describe('Questionnaire by lender ID', () => {
     before(() => {
-        cy.request("POST",SERVER_URL+'/api/functions/get_ui_testing_options').then(res=> OPTIONS=res.body.result)
+        cy.request("POST",SERVER_URL+'/api/functions/get_ui_testing_options',{create_lender:true}).then(res=> OPTIONS=res.body.result)
     });
 
     it('visit target 1 (no reinvest)',()=>{

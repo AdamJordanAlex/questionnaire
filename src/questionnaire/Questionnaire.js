@@ -45,6 +45,8 @@ const Questionnaire = () => {
         return acc;
     }, []);
 
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
     const init = () => {
         if (lender_id)
             loadQuestionnaireOptionsByLender();
@@ -222,10 +224,10 @@ const Questionnaire = () => {
                     {...field.props}
                 />
             case 'county_selector':
-                  return <GeoSelector2 
+                return <GeoSelector2
                     name={field.name}
                     label={field.label}
-                  />
+                />
             case 'number':
                 return <NumberField
                     name={field.name}
@@ -366,102 +368,104 @@ const Questionnaire = () => {
         setSubmitting(false);
     }
 
-    const replaceVariables = (text) =>{
-        const getValue=(m, key )=>{
+    const replaceVariables = (text) => {
+        const getValue = (m, key) => {
             console.log(key);
             let v = key.split("|");
             let parts = v[0].split(".");
-            let result=parts[0]=='lender'?lender:questionnaireData;
-            for (var i=1;i<parts.length;i++) {
-                console.log(i+":",result);
-                if (result) result=result[parts[i]];
+            let result = parts[0] == 'lender' ? lender : questionnaireData;
+            for (var i = 1; i < parts.length; i++) {
+                console.log(i + ":", result);
+                if (result) result = result[parts[i]];
             }
-            if (!result) result=v[1] || ""; //default value or blank
+            if (!result) result = v[1] || ""; //default value or blank
             console.log(result);
             return result;
         }
-        return text.replace( /%(.+?)%/g, getValue);
+        return text.replace(/%(.+?)%/g, getValue);
         return text;
     }
 
     return (
         <>
-            <Dialog
+            <Formik
+                enableReinitialize
+                validateForm
+                validateOnMount
+                innerRef={formEl}
+                onSubmit={onSubmit}
+                initialValues={allfields.reduce((a, v) => ({ ...a, [v.name]: (questionnaireData?.questionnaire ? questionnaireData?.questionnaire[v.name] : null) || (v.initial_value !== undefined ? v.initial_value : "") }), {})}
+                validationSchema={Yup.object().shape(questions[step]?.columns?.reduce((a, v) => {
+                    let rules = {};
+                    v.fields?.forEach(field => {
+                        if (field.validation?.type) {
+                            rules[field.name] = getValidationRules(field)
+                        }
+                    });
+                    v.groups?.forEach(group => {
+                        group.fields.forEach(field => {
+                            if (field.validation?.type) {
+                                rules[field.name] = getValidationRules(field)
+                            }
+                        });
+                    });
+                    return { ...a, ...rules };
+                }, {}))}
+            >
+                {({ isSubmitting, setSubmitting, values, isValid, errors, setFieldValue }) => (
+                    <Form ref={formEl}>
+                        <Dialog
 
-                classes={{
-                    root: classes.backDrop,
-                }}
-                PaperProps={{
-                    style: {
-                        background: 'linear-gradient(136.2deg, #FFFFFF 16.4%, #C8D1C8 92.26%)',
-                        boxShadow: '0px 0px 50px 10px rgba(0, 0, 0, 0.5)',
-                        maxWidth: questions[step]?.maxWidth || '900px',
-                        margin: '10px',
-                        minWidth: searchParams.get("embedded") ? "100%" : (questions[step]?.minWidth || '60%'),
-                    },
-                }}
-                fullScreen={searchParams.get("embedded") ? true : false}
-                open={true}
-                aria-labelledby="form-dialog-title"
-                >
-                {isLoading &&
-                    <QuestionnaireSkeleton />
-                }
-                {!isLoading && questionnaireNotification &&
-                    <Alert sx={{ fontSize: '18px' }} >{questionnaireNotification}</Alert>
-                }
-                {!isLoading && !questionnaireNotification &&
-                    <>
-                        <DialogTitle>
-                            <Box style={{ marginLeft: '20px', marginTop: '20px', }} >
-                                {lender?.logo &&
-                                    <img
-                                        src={lender?.logo?.url}
-                                        alt="Logo"
-                                        height="55px"
-                                        style={{ float: 'left', marginRight: '40px' }}
-                                    />
-                                }
-                                {questions[step]?.title &&
-                                    <Typography variant='h4'>{replaceVariables(questions[step].title)}</Typography>
-                                }
-                                {questions[step]?.subtitle_external && lender_id ?
-                                    <Typography variant='p' style={{ marginBottom: '5px' }} dangerouslySetInnerHTML={{ __html: replaceVariables(questions[step]?.subtitle_external)}} />
-                                    :<>
-                                    {questions[step]?.subtitle &&
-                                        <Typography variant='p' style={{ marginBottom: '5px' }} dangerouslySetInnerHTML={{ __html: replaceVariables(questions[step]?.subtitle) }} />
-                                    }
-                                    </>
-                                }
-                            </Box>
-                        </DialogTitle>
-                        <Formik
-                            enableReinitialize
-                            validateForm
-                            validateOnMount
-                            innerRef={formEl}
-                            onSubmit={onSubmit}
-                            initialValues={allfields.reduce((a, v) => ({ ...a, [v.name]: (questionnaireData?.questionnaire ? questionnaireData?.questionnaire[v.name] : null) || (v.initial_value !== undefined ? v.initial_value : "") }), {})}
-                            validationSchema={Yup.object().shape(questions[step]?.columns?.reduce((a, v) => {
-                                let rules = {};
-                                v.fields?.forEach(field => {
-                                    if (field.validation?.type) {
-                                        rules[field.name] = getValidationRules(field)
-                                    }
-                                });
-                                v.groups?.forEach(group => {
-                                    group.fields.forEach(field => {
-                                        if (field.validation?.type) {
-                                            rules[field.name] = getValidationRules(field)
-                                        }
-                                    });
-                                });
-                                return { ...a, ...rules };
-                            }, {}))}
+                            classes={{
+                                root: classes.backDrop,
+                            }}
+                            PaperProps={{
+                                style: {
+                                    background: 'linear-gradient(136.2deg, #FFFFFF 16.4%, #C8D1C8 92.26%)',
+                                    boxShadow: '0px 0px 50px 10px rgba(0, 0, 0, 0.5)',
+                                    maxWidth: questions[step]?.maxWidth || '900px',
+                                    margin: '10px',
+                                    minWidth: searchParams.get("embedded") ? "100%" : (questions[step]?.minWidth || '60%'),
+                                },
+                            }}
+                            fullScreen={searchParams.get("embedded") ? true : false}
+                            open={true}
+                            aria-labelledby="form-dialog-title"
+                            scroll="paper"
                         >
-                            {({ isSubmitting, setSubmitting, values, isValid, errors, setFieldValue }) => (
-                                <Form ref={formEl}>
-                                    <DialogContent >
+                            {isLoading &&
+                                <QuestionnaireSkeleton />
+                            }
+                            {!isLoading && questionnaireNotification &&
+                                <Alert sx={{ fontSize: '18px' }} >{questionnaireNotification}</Alert>
+                            }
+                            {!isLoading && !questionnaireNotification &&
+                                <>
+                                    <DialogTitle>
+                                        <Box style={{ marginLeft: '20px', marginTop: '20px', }} >
+                                            {lender?.logo &&
+                                                <img
+                                                    src={lender?.logo?.url}
+                                                    alt="Logo"
+                                                    height="55px"
+                                                    style={{ float: 'left', marginRight: '40px' }}
+                                                />
+                                            }
+                                            {questions[step]?.title &&
+                                                <Typography variant='h4'>{replaceVariables(questions[step].title)}</Typography>
+                                            }
+                                            {questions[step]?.subtitle_external && lender_id ?
+                                                <Typography variant='p' style={{ marginBottom: '5px' }} dangerouslySetInnerHTML={{ __html: replaceVariables(questions[step]?.subtitle_external) }} />
+                                                : <>
+                                                    {questions[step]?.subtitle &&
+                                                        <Typography variant='p' style={{ marginBottom: '5px' }} dangerouslySetInnerHTML={{ __html: replaceVariables(questions[step]?.subtitle) }} />
+                                                    }
+                                                </>
+                                            }
+                                        </Box>
+                                    </DialogTitle>
+
+                                    <DialogContent>
                                         {questions[step]?.notice && !(questions[step]?.hide_notice_if_last_step && isLastStep(values)) &&
                                             <Paper className={classes.dialogSubtitlePaper}>
                                                 <DialogContentText dangerouslySetInnerHTML={{ __html: replaceVariables(questions[step]?.notice) }} />
@@ -519,7 +523,7 @@ const Questionnaire = () => {
                                             })}
                                         </Grid>
                                     </DialogContent>
-                                    <DialogActions sx={{mx:5}}>
+                                    <DialogActions sx={{ mx: 5 }}>
                                         <Grid
                                             container
                                             direction='row'
@@ -527,7 +531,7 @@ const Questionnaire = () => {
                                             alignItems="center"
                                             spacing={0}
                                         >
-                                            <Grid item xs={12} sm={4}>
+                                            <Grid item xs={6} sm={4}>
                                                 <Box
                                                     display="flex"
                                                     justifyContent="flex-start"
@@ -547,23 +551,21 @@ const Questionnaire = () => {
                                                     }
                                                 </Box>
                                             </Grid>
-                                            <Grid item sm={4} >
+                                            <Grid item sm={4} order={{ xs: 3, sm: 2 }}>
                                                 <Box
                                                     display="flex"
                                                     justifyContent="center"
                                                     alignItems="center"
                                                     style={{ padding: '20px' }}
                                                 >
-                                                    <Box
-                                                        version="1.1"
-                                                    ><img
+                                                    <img
                                                             src="/logo_powered_by.png"
                                                             alt="Powered by nxtCRE"
                                                             width={'140px'}
-                                                        /></Box>
+                                                    />
                                                 </Box>
                                             </Grid>
-                                            <Grid item xs={12} sm={4}>
+                                            <Grid item xs={6} sm={4} order={{ xs: 2, sm: 3 }}>
                                                 <Box
                                                     display="flex"
                                                     justifyContent="flex-end"
@@ -595,12 +597,12 @@ const Questionnaire = () => {
                                             </Grid>
                                         </Grid>
                                     </DialogActions>
-                                </Form>
-                            )}
-                        </Formik>
-                    </>
-                }
-            </Dialog >
+                                </>
+                            }
+                        </Dialog >
+                    </Form>
+                )}
+            </Formik>
         </>
     )
 }
