@@ -17,6 +17,7 @@
     "axios": "^0.27.2",
     "axios-retry": "^3.3.1",
     "date-fns": "^2.29.1",
+    "env-cmd": "^10.1.0",
     "formik": "^2.2.9",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -32,8 +33,18 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "start:local": "env-cmd -f .env.local npm run start",
+    "start:prod": "env-cmd -f .env.production npm run start",
+    "start:dev": "env-cmd -f .env.development npm run start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "build:dev": "env-cmd -f .env.development npm run build",
+    "build:prod": "env-cmd -f .env.production npm run build",
+    "build:local": "env-cmd -f .env.local npm run build",
+    "deploy:dev": "aws s3 sync build/ s3://dev-q.nxtcre.com ",
+    "deploy:prod": "aws s3 sync build/ s3://q.nxtcre.com && aws cloudfront create-invalidation --distribution-id ESY7DNOH1209M --paths '/*'",
+    "test": "npx cypress run",
+    "test:spec": " npx cypress run --spec cypress/e2e/$npm_config_spec.cy.js",
+    "test:open": "npx cypress open",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -55,6 +66,7 @@
     ]
   },
   "devDependencies": {
+    "cypress": "^12.14.0",
     "cypress-react-selector": "^3.0.0"
   }
 }

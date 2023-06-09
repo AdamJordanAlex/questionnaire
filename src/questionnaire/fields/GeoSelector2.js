@@ -1,20 +1,22 @@
 import * as React from 'react';
 import { Wrapper, Status } from "@googlemaps/react-wrapper";
+import { at } from 'lodash';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { Button, Typography, Grid, Autocomplete, Box, TextField, Dialog, DialogTitle, DialogContent, DialogActions, IconButton, CircularProgress, Alert } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import throttle from 'lodash/throttle';
 import { getPredictions } from '../../api/API';
-import { useFormikContext, Field } from 'formik';
+import { useFormikContext, Field , useField} from 'formik';
 import MyMapComponent from './MyMapComponent';
 import './map.css';
 
 
 export default function GeoSelector2(props) {
   const { name: fieldName, label } = props;
+  const [field,meta] = useField(props);
   const [inputValue, setInputValue] = React.useState('');
   const [options, setOptions] = React.useState([]);
-  const { setFieldValue } = useFormikContext();
+  const { setFieldValue, setTouched, validateField } = useFormikContext();
   const [loading, setLoading] = React.useState(false);
   const [mapOpen, setMapOpen] = React.useState(false);
 
@@ -36,6 +38,13 @@ export default function GeoSelector2(props) {
       }, 200),
     [],
   );
+
+  React.useEffect(() => {
+    if (!field?.value?.length) {
+      //console.log("validating",field.value);
+      validateField(fieldName); // we have to manually validate for some reason...
+    }
+  }, []);
 
   React.useEffect(() => {
     let active = true;
@@ -155,10 +164,18 @@ export default function GeoSelector2(props) {
     return false;
   }
 
+  function _renderHelperText() {
+    const [touched, error] = at(meta, 'touched', 'error');
+    //console.log(field);
+    if (touched && error) {
+      return error;
+    }
+  }
+
   return (
     <Field name={fieldName}>
       {({
-        field, // { name, value, onChange, onBlur }
+       // field, // { name, value, onChange, onBlur }
       }) => (
         <>
           <Autocomplete
@@ -173,7 +190,7 @@ export default function GeoSelector2(props) {
             autoComplete
             //includeInputInList
             //filterSelectedOptions
-            value={field.value}
+            value={field.value || []}
             noOptionsText={getOptionsText()}
             isOptionEqualToValue={(option, value) => (option?.id === value?.id && option?.type === value?.type)} /*TODO show as choosed if parent choosed */
             onChange={(event, newValue) => {
@@ -182,8 +199,14 @@ export default function GeoSelector2(props) {
             onInputChange={(event, newInputValue) => {
               setInputValue(newInputValue);
             }}
+            onBlur={()=>setTouched({[fieldName]:true})}
             renderInput={(params) => (
-              <TextField {...params} label={label} fullWidth />
+              <TextField 
+                {...params} 
+                error={meta.touched && meta.error}
+                helperText={_renderHelperText()}
+                label={label} 
+                fullWidth />
             )}
             renderOption={renderOption}
             getOptionDisabled={(option)=>getOptionDisabled(option,field.value)}

@@ -96,6 +96,9 @@ const MyMapComponent = (props) => {
                     break;
                 case 'polygon':
                     let bounds = event.overlay?.getPath()?.getArray()?.map(coord => ({ lat: coord.lat(), lng: coord.lng() }));
+                    //we need to close polygon
+                    if (bounds[0]!==bounds[bounds.length-1]) bounds.push({lat:bounds[0].lat,lng:bounds[0].lng});
+                    //console.log("bounds:",bounds);
                     el = addElementByBoundaries(bounds);
                     break;
                 case 'rectangle':
@@ -155,6 +158,9 @@ const MyMapComponent = (props) => {
             var gpos = window.google.maps.geometry.spherical.computeOffset(center, radius, degreeStep * i);
             points.push({ lat: gpos.lat(), lng: gpos.lng() });
         };
+        //we also have to close polygon!
+        if (points[0]!==points[points.length-1]) points.push({ lat: points[0].lat, lng: points[0].lng });
+        //console.log("points",points);
         return points;
     }
 

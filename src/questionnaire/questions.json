@@ -149,8 +149,8 @@
                         "initial_value": [],
                         "validation":{
                             "type": "array",
-                            "min": 1,
-                            "required": "Please choose at least one county"
+                            "min": [1,"Please choose at least one location"],
+                            "required": "Please choose at least one location"
                         }
                     }
                 ]

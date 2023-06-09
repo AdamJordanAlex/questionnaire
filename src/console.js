@@ -2,15 +2,15 @@ import { saveError } from "./api/API";
 
 var console=(function(oldCons){
   return {
-      log: function(text){
-        oldCons.log(text);
+      log: function(...text){
+        oldCons.log(...text);
       },
-      info: function (text) {
-          oldCons.info(text);
+      info: function (...text) {
+          oldCons.info(...text);
           // Your code
       },
-      warn: function (text) {
-          oldCons.warn(text);
+      warn: function (...text) {
+          oldCons.warn(...text);
           // Your code
       },
       error: function (text,...rest) {

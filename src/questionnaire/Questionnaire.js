@@ -370,16 +370,16 @@ const Questionnaire = () => {
 
     const replaceVariables = (text) => {
         const getValue = (m, key) => {
-            console.log(key);
+            //console.log(key);
             let v = key.split("|");
             let parts = v[0].split(".");
             let result = parts[0] == 'lender' ? lender : questionnaireData;
             for (var i = 1; i < parts.length; i++) {
-                console.log(i + ":", result);
+                //console.log(i + ":", result);
                 if (result) result = result[parts[i]];
             }
             if (!result) result = v[1] || ""; //default value or blank
-            console.log(result);
+            //console.log(result);
             return result;
         }
         return text.replace(/%(.+?)%/g, getValue);
@@ -559,9 +559,9 @@ const Questionnaire = () => {
                                                     style={{ padding: '20px' }}
                                                 >
                                                     <img
-                                                            src="/logo_powered_by.png"
-                                                            alt="Powered by nxtCRE"
-                                                            width={'140px'}
+                                                        src="/logo_powered_by.png"
+                                                        alt="Powered by nxtCRE"
+                                                        width={'140px'}
                                                     />
                                                 </Box>
                                             </Grid>
@@ -592,7 +592,6 @@ const Questionnaire = () => {
                                                         )}
                                                         {isLastStep(values) ? 'SUBMIT' : 'NEXT'}
                                                     </Button>
-
                                                 </Box>
                                             </Grid>
                                         </Grid>
