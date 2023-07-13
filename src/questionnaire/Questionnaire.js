@@ -3,7 +3,7 @@ import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
 import { useState, useRef, useEffect, memo } from 'react';
 import useStyles from './styles';
-import questions from './questions.json';
+import default_questions from './questions.json';
 import { getQuestionnaire, getQuestionnaireOptionsByLender, submitQuestionnaire } from '../api/API';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
@@ -28,6 +28,7 @@ const Questionnaire = () => {
     const [step, setStep] = useState(0);
     const [questionnaireNotification, setQuestionnaireNotification] = useState(false);
     const [questionnaireData, setQuestionnaireData] = useState();
+    const [questions,setQuestions]=useState(default_questions);
     const [lender, setLender] = useState();
     const classes = useStyles();
     const formEl = useRef(null);
@@ -101,6 +102,9 @@ const Questionnaire = () => {
         try {
             let data = await getQuestionnaire(code);
             setLender(data?.questionnaire?.organization);
+            if (data.questionnaire?.template?.settings?.pages?.length>0) {
+                setQuestions(data.questionnaire.template.settings.pages);
+            }   
             //console.log(data);
             if (data?.questionnaire?.status === 'completed') {
                 if (data.user_exists) /**TODO show notification on login page that account exists */
