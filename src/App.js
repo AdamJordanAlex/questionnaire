@@ -29,6 +29,7 @@ function App() {
         <Routes>
           <Route path="/:code" element={<Questionnaire />} />
           <Route path="/l/:lender_id" element={<Questionnaire />} />
+          <Route path="/q/:short_code" element={<Questionnaire />} />
           <Route path="*" element={<NotFound />} />
       </Routes>
     /</ThemeProvider>

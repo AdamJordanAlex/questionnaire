@@ -4,7 +4,7 @@ import * as Yup from 'yup';
 import { useState, useRef, useEffect, memo } from 'react';
 import useStyles from './styles';
 import default_questions from './questions.json';
-import { getQuestionnaire, getQuestionnaireOptionsByLender, submitQuestionnaire } from '../api/API';
+import { getQuestionnaire, getQuestionnaireOptionsByLender, getQuestionnaireOptionsByShortCode, submitQuestionnaire } from '../api/API';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import HelpIcon from '@mui/icons-material/Help';
@@ -22,7 +22,7 @@ import { useSearchParams, useLocation, useParams } from "react-router-dom";
 
 const Questionnaire = () => {
     const location = useLocation();
-    const { code, lender_id } = useParams();
+    const { code, lender_id,short_code } = useParams();
     const [searchParams, setSearchParams] = useSearchParams();
     const [isLoading, setLoading] = useState(true);
     const [step, setStep] = useState(0);
@@ -51,8 +51,39 @@ const Questionnaire = () => {
     const init = () => {
         if (lender_id)
             loadQuestionnaireOptionsByLender();
+        else if (short_code)
+            loadQuestionnaireOptionsByShortCode();
         else
             loadQuestionnaire();
+    }
+
+    const loadQuestionnaireOptionsByShortCode=async ()=>{
+        setLoading(true);
+        try {
+            let data = await getQuestionnaireOptionsByShortCode(short_code);
+            data.questionnaire = {};
+            if (searchParams.get("email")) data.questionnaire.primary_email = searchParams.get("email");
+            if (searchParams.get("phone")) data.questionnaire.phone = searchParams.get("phone");
+            if (searchParams.get("first_name")) data.questionnaire.first_name = searchParams.get("first_name");
+            if (searchParams.get("last_name")) data.questionnaire.last_name = searchParams.get("last_name");
+            if (searchParams.get("organization")) data.questionnaire.organization_name = searchParams.get("organization");
+            setQuestionnaireData(data);
+            setLender(data.lender);
+            if (data.template?.settings?.pages?.length>0) {
+                setQuestions(data.template.settings.pages);
+            } 
+        } catch (err) {
+            setQuestionnaireNotification(<>
+                <p>{err.message || "Questionnaire not found"}</p>
+                <Link
+                    href="https://nxtcre.com"
+                    rel="questionnaire"
+                    variant="body2"
+                    sx={{ mb: 2 }}
+                >GO TO NXTCRE.COM</Link>
+            </>);
+        }
+        setLoading(false);
     }
 
     const loadQuestionnaireOptionsByLender = async () => {
@@ -335,6 +366,8 @@ const Questionnaire = () => {
         });
         if (!questionnaireData.questionnaire.id && lender_id) { //external questionnaire by lender_id
             data.lender_id = lender_id;
+        } else if (short_code) {
+            data.short_code=short_code;
         } else
             data.code = questionnaireData.questionnaire?.code || questionnaireData.questionnaire?.code_for_copy;
         setSubmitting(true);

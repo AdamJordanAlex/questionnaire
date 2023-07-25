@@ -53,6 +53,16 @@ export const getQuestionnaireOptionsByLender = async (lender_id)=>{
       return handleStatusCode(error);
   }
 }
+
+export const getQuestionnaireOptionsByShortCode = async (short_code)=>{
+  try {
+      const response=await api().post(process.env.REACT_APP_PARSE_URL + '/functions/get_questionnaire_options',{short_code,include_counties:process.env.REACT_APP_PRELOAD_COUNTIES=="true"?true:false});
+      return response.data.result;
+  } catch (error) {
+      return handleStatusCode(error);
+  }
+}
+
 export const submitQuestionnaire = async (values)=>{
   try {
       const response=await api().post(process.env.REACT_APP_PARSE_URL + '/functions/submit_questionnaire',values);
