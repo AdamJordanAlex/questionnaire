@@ -355,6 +355,15 @@ const Questionnaire = () => {
         let data = { ...values };
         if (data.counties && data.counties?.length) data.counties = data.counties.map((loc => loc.id));
         if (data.payoff_reason === 'REFINANCE') data.reinvesting = false;
+        if (!data.reinvesting && !code) {
+            //we don't need to save non-reinvesting questionnaire if it's universal/direct link
+            setQuestionnaireNotification(<>
+                <h1>Thank you</h1>
+                <p>Thank you for your response, you may now close this window.</p>
+                </>
+            );
+            return;
+        }
         allfields.forEach(field => {
             if (field.type === "datepicker") {
                 data[field.name] = {
