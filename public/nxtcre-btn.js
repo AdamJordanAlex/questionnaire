@@ -96,7 +96,7 @@ class NxtCREbtn {
         iframe.style.borderRadius="1rem";
         iframe.height="100%";
         iframe.style.height="100%";
-        let url=(this.el.getAttribute("data-url") || "https://q.nxtcre.com") + "/l/"+this.el.getAttribute("data-lender-id")+"?embedded=true";
+        let url=(this.el.getAttribute("data-url") || "https://q.nxt-cre.com") + "/l/"+this.el.getAttribute("data-lender-id")+"?embedded=true";
         if (this.el.getAttribute("data-last_name")) url+="&last_name="+this.el.getAttribute("data-last_name");
         if (this.el.getAttribute("data-first_name")) url+="&first_name="+this.el.getAttribute("data-first_name");
         if (this.el.getAttribute("data-email")) url+="&email="+this.el.getAttribute("data-email");

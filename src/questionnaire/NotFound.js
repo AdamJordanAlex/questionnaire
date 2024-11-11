@@ -31,11 +31,11 @@ const NotFound = () => {
             }}
           >
             <Link
-              href="https://nxtcre.com"
+              href="https://www.nxt-cre.com"
               rel="questionnaire"
               variant="body2"
               sx={{ mb: 2 }}
-            >GO TO NXTCRE.COM</Link>
+            >GO TO NXT-CRE.COM</Link>
           </Box>
         </Container>
       </Box>

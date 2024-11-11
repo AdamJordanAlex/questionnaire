@@ -76,11 +76,11 @@ const Questionnaire = () => {
             setQuestionnaireNotification(<>
                 <p>{err.message || "Questionnaire not found"}</p>
                 <Link
-                    href="https://nxtcre.com"
+                    href="https://www.nxt-cre.com"
                     rel="questionnaire"
                     variant="body2"
                     sx={{ mb: 2 }}
-                >GO TO NXTCRE.COM</Link>
+                >GO TO NXT-CRE.COM</Link>
             </>);
         }
         setLoading(false);
@@ -92,11 +92,11 @@ const Questionnaire = () => {
             setQuestionnaireNotification(<>
                 <p>Internal error</p>
                 <Link
-                    href="https://nxtcre.com"
+                    href="https://www.nxt-cre.com"
                     rel="questionnaire"
                     variant="body2"
                     sx={{ mb: 2 }}
-                >GO TO NXTCRE.COM</Link>
+                >GO TO NXT-CRE.COM</Link>
             </>);
             return;
         }
@@ -118,11 +118,11 @@ const Questionnaire = () => {
             setQuestionnaireNotification(<>
                 <p>{err.message || "Questionnaire not found"}</p>
                 <Link
-                    href="https://nxtcre.com"
+                    href="https://www.nxt-cre.com"
                     rel="questionnaire"
                     variant="body2"
                     sx={{ mb: 2 }}
-                >GO TO NXTCRE.COM</Link>
+                >GO TO NXT-CRE.COM</Link>
             </>);
         }
         setLoading(false);
@@ -182,11 +182,11 @@ const Questionnaire = () => {
             setQuestionnaireNotification(<>
                 <p>{err.message || "Questionnaire not found"}</p>
                 <Link
-                    href="https://nxtcre.com"
+                    href="https://www.nxt-cre.com"
                     rel="questionnaire"
                     variant="body2"
                     sx={{ mb: 2 }}
-                >GO TO NXTCRE.COM</Link>
+                >GO TO NXT-CRE.COM</Link>
             </>);
         }
         setLoading(false);
@@ -396,14 +396,14 @@ const Questionnaire = () => {
                 <p>Thank you for your response, you may now close this window.</p>
                 {searchParams.get("embedded") && data.reinvesting &&
                     <>
-                        To view property matches now, set up your account on nxtCRE.com <br />
+                        To view property matches now, set up your account on nxt-CRE.com <br />
                         <Link
                             href={process.env.REACT_APP_MAIN_URL + "/auth/register/mbi/" + res?.redirect_code}
                             rel="questionnaire"
                             variant="body2"
                             target="_blank"
                             sx={{ mb: 2 }}
-                        >GO TO NXTCRE.COM</Link>
+                        >GO TO NXT-CRE.COM</Link>
                     </>
                 }
             </>)
