@@ -26,16 +26,23 @@ export default function GeoSelector2(props) {
     () =>
       throttle((search, callback) => {
         setLoading(true);
-        if (search.length < 3) {
+        if (search.length < 2) {
           setLoading(false);
           callback([]);
+          return;
         }
-        else getPredictions(search).then(results => {
-          //console.log("RESULTS",results.places);
-          callback(results);
-          setLoading(false);
-        });
-      }, 200),
+        
+        getPredictions(search)
+          .then(results => {
+            callback(results || { places: [], states: [] });
+            setLoading(false);
+          })
+          .catch(error => {
+            console.error('Error fetching geo predictions:', error);
+            callback({ places: [], states: [] });
+            setLoading(false);
+          });
+      }, 300), // Increased throttle from 200ms to 300ms
     [],
   );
 

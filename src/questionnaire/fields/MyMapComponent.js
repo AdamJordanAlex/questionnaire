@@ -247,6 +247,7 @@ const MyMapComponent = (props) => {
         if (!map) initMap();
     }, []);
 
+  
 
 
     return <div ref={ref} id="map" style={{ minHeight: '300px' }} />;
